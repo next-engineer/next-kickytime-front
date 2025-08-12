@@ -1,32 +1,44 @@
-name: CI
+name: 프론트엔드 CI (React + Vite)
 
 on:
-  pull_request:
-    branches: [main, develop]
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
 
 jobs:
-  build-and-lint:
+  ci:
+    name: 프론트엔드 코드 검사 및 빌드
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: 코드 체크아웃
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 18
-        uses: actions/setup-node@v3
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Install dependencies
+      - name: 의존성 설치
         run: npm ci
 
-      - name: Format check (Prettier)
-        run: npx prettier --check .
+      - name: Prettier 포맷 검사
+        run: npm run format:check
 
-      - name: Lint check (ESLint)
-        run: npx eslint . --ext .js,.jsx,.ts,.tsx
+      - name: ESLint 검사
+        run: npm run lint
 
-      - name: Run tests (Jest)
-        run: npm test -- --ci
+      - name: 타입스크립트 타입 체크
+        run: npx tsc --noEmit
+
+      - name: Vite 빌드
+        run: npm run build
+
+      - name: 빌드 결과 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: fe-dist
+          path: dist
+          if-no-files-found: error
