@@ -32,8 +32,17 @@ export default tseslint.config([
       // Prettier 결과를 ESLint 오류로 승격
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
 
-      // 팀 규칙 예시
-      'no-unused-vars': 'warn',
+      // JS 기본 unused 규칙 끄고, TS 전용 규칙 사용 + 언더스코어는 무시
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
 ]);
