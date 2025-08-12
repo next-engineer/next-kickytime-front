@@ -12,13 +12,10 @@ export default function AuthCallbackPage() {
     (async () => {
       try {
         const result = await handleAuthCallback();
-        if (!result) {
-          navigate('/', { replace: true });
-          return;
+        if (result) {
+          useAuthStore.getState().syncFromStorage();
         }
-        useAuthStore.getState().syncFromStorage();
-
-        navigate('/matches', { replace: true });
+        navigate('/', { replace: true });
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : '인증 처리 중 오류가 발생했습니다.';
         setError(message);
