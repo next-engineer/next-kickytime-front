@@ -9,14 +9,15 @@
 
 ### 선택: GitLab Flow – 단순 브랜치형
 
-| 브랜치 | 설명 |
-| --- | --- |
-| `main` | 운영 환경(Production) 배포용 |
-| `develop` | 개발 통합 브랜치, 기능 병합 전 테스트 공간 |
+| 브랜치      | 설명                                        |
+| ----------- | ------------------------------------------- |
+| `main`      | 운영 환경(Production) 배포용                |
+| `develop`   | 개발 통합 브랜치, 기능 병합 전 테스트 공간  |
 | `feature/*` | 기능별 브랜치 (`feature/이슈번호-간단설명`) |
-| `hotfix/*` | 운영 중 발생한 긴급 수정 브랜치 |
+| `hotfix/*`  | 운영 중 발생한 긴급 수정 브랜치             |
 
 **운영 규칙**
+
 - `main`, `develop`은 보호 브랜치로 설정하고, 직접 푸시 금지
 - 모든 변경은 Pull Request(PR)를 통해 병합
 - 최소 1명 이상의 코드 리뷰 승인 필수
@@ -28,7 +29,8 @@
 
 ## 2. 커밋 메시지 전략
 
-**규칙**: [Conventional Commits](https://www.conventionalcommits.org/ko/v1.0.0/) + [Gitmoji](https://gitmoji.dev/)  
+**규칙**: [Conventional Commits](https://www.conventionalcommits.org/ko/v1.0.0/) + [Gitmoji](https://gitmoji.dev/)
+
 ```
 
 <이모지> <타입>(선택적 scope): <커밋 메시지>
@@ -37,25 +39,25 @@
 
 ### 타입 & 이모지 예시
 
-| 이모지 | 타입 | 예시 | 설명 |
-| --- | --- | --- | --- |
-| ✨ | `feat` | ✨ feat(auth): 사용자 대시보드 페이지 추가 | 새로운 기능 개발 |
-| 🐛 | `fix` | 🐛 fix(login): 로그인 실패 시 예외 처리 추가 | 사용자 영향 버그 수정 |
-| 🚨 | `fix` | 🚨 fix(test): 테스트 실패 원인 수정 | 테스트/빌드 오류 수정 |
-| ♻️ | `refactor` | ♻️ refactor: 중복 조건문 제거 | 기능 변화 없는 구조 개선 |
-| 📄 | `docs` | 📄 docs: 배포 방법 문서 추가 | 문서 수정/주석 |
-| 🎨 | `style` | 🎨 style: 공백 및 줄 정리 | 스타일 변경 (로직 X) |
-| 🧱 | `arch` | 🧱 arch: DDD 계층 구조로 변경 | 전체 아키텍처 변경 |
-| 🏗️ | `setup` | 🏗️ setup: Spring Boot 초기 설정 | 프로젝트 셋업 |
-| 🔧 | `config` | 🔧 config: DB 설정 추가 | 설정 파일 변경 |
-| 📦 | `chore` | 📦 chore: 라이브러리 버전 정리 | 유지보수/빌드 관리 |
-| 🧪 | `test` | 🧪 test(user): 사용자 조회 API 테스트 추가 | 테스트 코드 |
-| 💄 | `ui` | 💄 ui: 버튼 색상 변경 | UI 수정 |
-| 📐 | `design` | 📐 design: 메인 페이지 레이아웃 구성 | 디자인/레이아웃 |
-| ⬆️ | `upgrade` | ⬆️ upgrade: React 18로 업그레이드 | 의존성 업 |
-| ⬇️ | `downgrade` | ⬇️ downgrade: Java 17→11 | 의존성 다운 |
-| 🔥 | `remove` | 🔥 remove: 사용되지 않는 모듈 삭제 | 대규모 삭제 |
-| ✏️ | `fix` | ✏️ fix: 변수명 오타 수정 | 오타 수정 |
+| 이모지 | 타입        | 예시                                         | 설명                     |
+| ------ | ----------- | -------------------------------------------- | ------------------------ |
+| ✨     | `feat`      | ✨ feat(auth): 사용자 대시보드 페이지 추가   | 새로운 기능 개발         |
+| 🐛     | `fix`       | 🐛 fix(login): 로그인 실패 시 예외 처리 추가 | 사용자 영향 버그 수정    |
+| 🚨     | `fix`       | 🚨 fix(test): 테스트 실패 원인 수정          | 테스트/빌드 오류 수정    |
+| ♻️     | `refactor`  | ♻️ refactor: 중복 조건문 제거                | 기능 변화 없는 구조 개선 |
+| 📄     | `docs`      | 📄 docs: 배포 방법 문서 추가                 | 문서 수정/주석           |
+| 🎨     | `style`     | 🎨 style: 공백 및 줄 정리                    | 스타일 변경 (로직 X)     |
+| 🧱     | `arch`      | 🧱 arch: DDD 계층 구조로 변경                | 전체 아키텍처 변경       |
+| 🏗️     | `setup`     | 🏗️ setup: Spring Boot 초기 설정              | 프로젝트 셋업            |
+| 🔧     | `config`    | 🔧 config: DB 설정 추가                      | 설정 파일 변경           |
+| 📦     | `chore`     | 📦 chore: 라이브러리 버전 정리               | 유지보수/빌드 관리       |
+| 🧪     | `test`      | 🧪 test(user): 사용자 조회 API 테스트 추가   | 테스트 코드              |
+| 💄     | `ui`        | 💄 ui: 버튼 색상 변경                        | UI 수정                  |
+| 📐     | `design`    | 📐 design: 메인 페이지 레이아웃 구성         | 디자인/레이아웃          |
+| ⬆️     | `upgrade`   | ⬆️ upgrade: React 18로 업그레이드            | 의존성 업                |
+| ⬇️     | `downgrade` | ⬇️ downgrade: Java 17→11                     | 의존성 다운              |
+| 🔥     | `remove`    | 🔥 remove: 사용되지 않는 모듈 삭제           | 대규모 삭제              |
+| ✏️     | `fix`       | ✏️ fix: 변수명 오타 수정                     | 오타 수정                |
 
 ---
 
@@ -82,6 +84,7 @@
 ## 5. Issue 템플릿
 
 ### 제공되는 템플릿 종류
+
 - ✨ 기능 요청 (Feature request)
 - 🐛 버그 보고 (Bug report)
 - 📝 문서 변경 요청 (Documentation)
@@ -108,6 +111,7 @@
 ---
 
 ## 8. 참고 링크
+
 - [Conventional Commits](https://www.conventionalcommits.org/ko/v1.0.0/)
 - [Gitmoji](https://gitmoji.dev/)
 - [Semantic Versioning](https://semver.org/lang/ko/)
