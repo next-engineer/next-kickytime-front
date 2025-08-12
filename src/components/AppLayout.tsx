@@ -29,6 +29,7 @@ import SportsIcon from '@mui/icons-material/Sports';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import { tokens } from '../styles/theme';
+import { goLogin, goSignup } from '../auth/hostedUi';
 
 export default function AppLayout() {
   const navigate = useNavigate();
@@ -297,7 +298,7 @@ export default function AppLayout() {
             >
               <Button
                 color="inherit"
-                onClick={() => navigate('/login')}
+                onClick={() => goLogin()}
                 sx={{
                   borderRadius: tokens.borderRadius.md,
                   px: { xs: 2, sm: 3 },
@@ -312,7 +313,7 @@ export default function AppLayout() {
               </Button>
               <Button
                 variant="contained"
-                onClick={() => navigate('/signup')}
+                onClick={() => goSignup()}
                 sx={{
                   borderRadius: tokens.borderRadius.md,
                   px: { xs: 2, sm: 3 },

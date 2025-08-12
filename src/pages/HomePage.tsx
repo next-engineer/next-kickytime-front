@@ -24,6 +24,7 @@ import EventIcon from '@mui/icons-material/Event';
 import SecurityIcon from '@mui/icons-material/Security';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { tokens } from '../styles/theme';
+import { goLogin, goSignup } from '../auth/hostedUi';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -347,7 +348,7 @@ export default function HomePage() {
               >
                 <Button
                   variant="outlined"
-                  onClick={() => navigate('/signup')}
+                  onClick={() => goSignup()}
                   sx={{
                     borderColor: tokens.colors.neutral[400],
                     color: tokens.colors.neutral[700],
@@ -362,7 +363,7 @@ export default function HomePage() {
                 </Button>
                 <Button
                   variant="outlined"
-                  onClick={() => navigate('/login')}
+                  onClick={() => goLogin()}
                   sx={{
                     borderColor: tokens.colors.neutral[400],
                     color: tokens.colors.neutral[700],
