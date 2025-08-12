@@ -57,8 +57,8 @@ export async function handleAuthCallback(): Promise<TokenResponse | null> {
 
   try {
     await postUserMe();
-    const me = await getMyProfile();
-    useAuthStore.getState().setUser(me);
+    // const me = await getMyProfile();
+    // useAuthStore.getState().setUser(me);
   } catch (e) {
     console.error('[callback] user sync failed', e);
   }

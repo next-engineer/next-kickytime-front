@@ -2,10 +2,10 @@ import { api } from './axiosInstance';
 import type { User } from '../types';
 
 export async function postUserMe(): Promise<void> {
-  await api.post('/user/me', null);
+  await api.post('users/me', null);
 }
 
 export async function getMyProfile(): Promise<User> {
-  const { data } = await api.get<User>('/user/me');
+  const { data } = await api.get<User>('users/me');
   return data;
 }
