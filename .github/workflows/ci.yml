@@ -2,9 +2,9 @@ name: 프론트엔드 CI (React + Vite)
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   ci:
