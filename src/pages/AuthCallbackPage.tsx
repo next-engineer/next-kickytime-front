@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Container, Paper, Typography, Button, CircularProgress, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { handleAuthCallback } from '../auth/callback';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ export default function AuthCallbackPage() {
           navigate('/', { replace: true });
           return;
         }
+        useAuthStore.getState().syncFromStorage();
+
         navigate('/matches', { replace: true });
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : '인증 처리 중 오류가 발생했습니다.';

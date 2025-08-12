@@ -1,35 +1,49 @@
 import { create } from 'zustand';
 import type { User } from '../types';
 
+type Tokens = {
+  idToken: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+};
+
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
   joinedMatchIds: number[];
-  login: (_user: User) => void; // user -> _user
+
+  // 기존 액션
+  login: (_user: User) => void;
   logout: () => void;
-  joinMatch: (_matchId: number) => void; // matchId -> _matchId
-  leaveMatch: (_matchId: number) => void; // matchId -> _matchId
-  setJoinedMatches: (_matchIds: number[]) => void; // matchIds -> _matchIds
+  joinMatch: (_matchId: number) => void;
+  leaveMatch: (_matchId: number) => void;
+  setJoinedMatches: (_matchIds: number[]) => void;
+
+  // 추가: 토큰 관련
+  tokens: Tokens;
+  setTokens: (tokens: Tokens) => void;
+  syncFromStorage: () => void;
+  clearTokens: () => void;
 }
 
-// Mock users for demonstration - ERD 변경사항 반영
+// Mock users (기존 유지)
 const mockUsers: Record<string, User> = {
   admin: {
-    id: 1, // userId -> id
+    id: 1,
     email: 'admin@kickytime.com',
     nickname: '관리자',
     role: 'ADMIN',
     rank: 'MASTER',
-    imageUrl: '/images/default-profile.png', // profileImageUrl -> imageUrl
+    imageUrl: '/images/default-profile.png',
     createdAt: '2025-08-01T12:00:00Z',
   },
   user: {
-    id: 2, // userId -> id
+    id: 2,
     email: 'user@kickytime.com',
     nickname: '민지',
     role: 'USER',
-    rank: 'BEGINNER', // BEGINER -> BEGINNER
-    imageUrl: '/images/default-profile.png', // profileImageUrl -> imageUrl
+    rank: 'BEGINNER',
+    imageUrl: '/images/default-profile.png',
     createdAt: '2025-08-01T12:00:00Z',
   },
 };
@@ -37,14 +51,31 @@ const mockUsers: Record<string, User> = {
 export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   user: null,
-  joinedMatchIds: [1, 3], // Mock joined matches (ID 변경)
+  joinedMatchIds: [1, 3],
 
+  // 초기 토큰 상태
+  tokens: {
+    idToken: null,
+    accessToken: null,
+    refreshToken: null,
+  },
+
+  // 기존 로직 유지
   login: (user: User) => {
     set({ isAuthenticated: true, user });
   },
 
   logout: () => {
-    set({ isAuthenticated: false, user: null, joinedMatchIds: [] });
+    // 토큰도 함께 정리
+    localStorage.removeItem('id_token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    set({
+      isAuthenticated: false,
+      user: null,
+      joinedMatchIds: [],
+      tokens: { idToken: null, accessToken: null, refreshToken: null },
+    });
   },
 
   joinMatch: (matchId: number) => {
@@ -62,9 +93,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setJoinedMatches: (matchIds: number[]) => {
     set({ joinedMatchIds: matchIds });
   },
+
+  // 추가: 교환 결과를 직접 세팅하고 싶을 때 사용 가능
+  setTokens: (tokens: Tokens) => {
+    set({
+      tokens,
+      isAuthenticated: Boolean(tokens.accessToken),
+    });
+  },
+
+  // 추가: localStorage → store 동기화
+  syncFromStorage: () => {
+    const idToken = localStorage.getItem('id_token');
+    const accessToken = localStorage.getItem('access_token');
+    const refreshToken = localStorage.getItem('refresh_token');
+    set({
+      tokens: { idToken, accessToken, refreshToken },
+      isAuthenticated: Boolean(accessToken),
+    });
+  },
+
+  // 추가: 로그아웃 외 개별적으로 토큰 비우고 싶을 때
+  clearTokens: () => {
+    localStorage.removeItem('id_token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    set({
+      tokens: { idToken: null, accessToken: null, refreshToken: null },
+      isAuthenticated: false,
+    });
+  },
 }));
 
-// Helper function to mock login
+// 기존 유지
 export const mockLogin = (userType: 'admin' | 'user') => {
   const authStore = useAuthStore.getState();
   authStore.login(mockUsers[userType]);
