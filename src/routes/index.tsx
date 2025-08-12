@@ -1,25 +1,27 @@
-import { createBrowserRouter } from "react-router-dom"
-import AppLayout from "../components/AppLayout"
-import ProtectedRoute from "../components/ProtectedRoute"
-import HomePage from "../pages/HomePage"
-import SignupPage from "../pages/SignupPage"
-import LoginPage from "../pages/LoginPage"
-import ProfilePage from "../pages/ProfilePage"
-import MatchesPage from "../pages/MatchesPage"
-import MyMatchesPage from "../pages/MyMatchesPage"
-import CreateMatchPage from "../pages/CreateMatchPage"
-import NotFoundPage from "../pages/NotFoundPage"
+import { createBrowserRouter } from 'react-router-dom';
+import AppLayout from '../components/AppLayout';
+import ProtectedRoute from '../components/ProtectedRoute';
+import HomePage from '../pages/HomePage';
+import SignupPage from '../pages/SignupPage';
+import LoginPage from '../pages/LoginPage';
+import ProfilePage from '../pages/ProfilePage';
+import MatchesPage from '../pages/MatchesPage';
+import MyMatchesPage from '../pages/MyMatchesPage';
+import CreateMatchPage from '../pages/CreateMatchPage';
+import NotFoundPage from '../pages/NotFoundPage';
+import AuthCallbackPage from '../pages/AuthCallbackPage';
 
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <AppLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "signup", element: <SignupPage /> },
-      { path: "login", element: <LoginPage /> },
+      { path: 'signup', element: <SignupPage /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'auth/callback', element: <AuthCallbackPage /> },
       {
-        path: "profile",
+        path: 'profile',
         element: (
           <ProtectedRoute>
             <ProfilePage />
@@ -27,7 +29,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "matches",
+        path: 'matches',
         element: (
           <ProtectedRoute>
             <MatchesPage />
@@ -35,7 +37,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "matches/mine",
+        path: 'matches/mine',
         element: (
           <ProtectedRoute>
             <MyMatchesPage />
@@ -43,14 +45,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "admin/matches/new",
+        path: 'admin/matches/new',
         element: (
           <ProtectedRoute requiredRole="ADMIN">
             <CreateMatchPage />
           </ProtectedRoute>
         ),
       },
-      { path: "*", element: <NotFoundPage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
-])
+]);
