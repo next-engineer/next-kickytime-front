@@ -1,4 +1,6 @@
 import { COGNITO } from './config';
+import { useAuthStore } from '../store/useAuthStore';
+import { postUserMe, getMyProfile } from '../api/userApi';
 
 export type TokenResponse = {
   id_token: string;
@@ -45,11 +47,22 @@ export async function handleAuthCallback(): Promise<TokenResponse | null> {
 
   if (!res.ok) throw new Error(json.error_description ?? 'Token exchange failed');
 
-  localStorage.setItem('id_token', json.id_token);
-  localStorage.setItem('access_token', json.access_token);
-  if (json.refresh_token) localStorage.setItem('refresh_token', json.refresh_token);
+  useAuthStore.getState().setTokens({
+    idToken: json.id_token ?? null,
+    accessToken: json.access_token ?? null,
+    refreshToken: json.refresh_token ?? null,
+  });
 
   sessionStorage.removeItem('pkce_verifier');
+
+  try {
+    await postUserMe();
+    const me = await getMyProfile();
+    useAuthStore.getState().setUser(me);
+  } catch (e) {
+    console.error('[callback] user sync failed', e);
+  }
+
   // code 제거 (새로고침 시 재호출 방지)
   window.history.replaceState({}, '', COGNITO.redirectUri);
 

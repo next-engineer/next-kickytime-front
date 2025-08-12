@@ -24,6 +24,9 @@ interface AuthState {
   setTokens: (tokens: Tokens) => void;
   syncFromStorage: () => void;
   clearTokens: () => void;
+
+  // [추가] /user/me 응답을 전역에 반영하기 위한 액션
+  setUser: (_user: User | null) => void; // ← [추가]
 }
 
 // Mock users (기존 유지)
@@ -96,6 +99,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   // 추가: 교환 결과를 직접 세팅하고 싶을 때 사용 가능
   setTokens: (tokens: Tokens) => {
+    // [수정] 새로고침 유지 위해 로컬스토리지에도 반영
+    localStorage.setItem('id_token', tokens.idToken ?? '');
+    localStorage.setItem('access_token', tokens.accessToken ?? '');
+    localStorage.setItem('refresh_token', tokens.refreshToken ?? '');
+
     set({
       tokens,
       isAuthenticated: Boolean(tokens.accessToken),
@@ -123,6 +131,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       isAuthenticated: false,
     });
   },
+
+  // [추가] /user/me 결과 반영
+  setUser: (_user) => set({ user: _user }), // ← [추가]
 }));
 
 // 기존 유지

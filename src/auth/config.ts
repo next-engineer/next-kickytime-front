@@ -17,5 +17,5 @@ export const COGNITO: CognitoConfig = {
   hostedUiDomain: requireEnv('VITE_COGNITO_DOMAIN'),
   clientId: requireEnv('VITE_COGNITO_CLIENT_ID'),
   redirectUri: requireEnv('VITE_COGNITO_REDIRECT_URI'),
-  scopes: ['openid', 'email'],
+  scopes: ['openid', 'email', 'profile'],
 };
