@@ -9,6 +9,7 @@ import MatchesPage from '../pages/MatchesPage';
 import MyMatchesPage from '../pages/MyMatchesPage';
 import CreateMatchPage from '../pages/CreateMatchPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import AuthCallbackPage from '../pages/AuthCallbackPage';
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'signup', element: <SignupPage /> },
       { path: 'login', element: <LoginPage /> },
+      { path: 'auth/callback', element: <AuthCallbackPage /> },
       {
         path: 'profile',
         element: (
