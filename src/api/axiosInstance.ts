@@ -1,67 +1,130 @@
-import axios from 'axios';
+// src/api/axiosInstance.ts
+import axios, { AxiosError } from 'axios';
+import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { useAuthStore } from '../store/useAuthStore';
 
-// 환경변수 검증
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+// --- 기본 설정 & 환경 변수 검증 ---
+const baseURL = import.meta.env.VITE_API_BASE_URL as string | undefined;
 if (!baseURL) {
   throw new Error('VITE_API_BASE_URL environment variable is required');
 }
+const DEBUG = import.meta.env.VITE_DEBUG_MODE === 'true';
 
 export const api = axios.create({
   baseURL,
   timeout: 10000,
 });
 
-// Request interceptor for adding auth token
-api.interceptors.request.use((config) => {
-  // API 호출 시 JWT 토큰을 헤더에 추가
-  // const token = localStorage.getItem('accessToken');
-  // if (token) {
-  //   config.headers.Authorization = `Bearer ${token}`;
-  // }
+// --- 유틸들 ---
+function getAccessToken(): string | null {
+  const { tokens } = useAuthStore.getState();
+  return tokens?.accessToken ?? localStorage.getItem('access_token');
+}
 
-  // 개발 모드에서 요청 로깅
-  if (import.meta.env.VITE_DEBUG_MODE === 'true') {
-    console.log('API Request:', {
-      method: config.method?.toUpperCase(),
-      url: config.url,
-      baseURL: config.baseURL,
-      data: config.data,
-    });
+function toAbsoluteURL(url?: string, cfgBaseURL?: string): URL | null {
+  if (!url) return null;
+  try {
+    return new URL(url); // 절대 URL
+  } catch {
+    try {
+      return new URL(url, cfgBaseURL ?? baseURL); // 상대 → 절대
+    } catch {
+      return null;
+    }
   }
+}
 
+const SKIP_AUTH_PATHS = ['/auth/refresh', '/auth/logout', '/health'];
+
+function shouldSkipAuth(config: InternalAxiosRequestConfig): boolean {
+  // 사용자가 직접 Authorization을 준 경우 존중
+  const hasAuthHeader =
+    (config.headers?.Authorization as string | undefined) ??
+    (config.headers as Record<string, unknown> | undefined)?.authorization;
+  if (hasAuthHeader) return true;
+
+  const reqUrl = toAbsoluteURL(config.url, config.baseURL ?? baseURL);
+  if (!reqUrl) return false;
+
+  // baseURL과 동일한 오리진에만 토큰 부착
+  const base = new URL(baseURL!);
+  if (reqUrl.origin !== base.origin) return true;
+
+  // baseURL에 path prefix가 있는 경우(예: https://host/api) 그 하위 경로만 적용
+  if (!reqUrl.pathname.startsWith(base.pathname)) return true;
+
+  // 스킵 리스트 적용 (base pathname 이후의 상대 경로 기준)
+  const relPath = reqUrl.pathname.slice(base.pathname.length) || '/';
+  return SKIP_AUTH_PATHS.some((p) => relPath.startsWith(p));
+}
+
+function safeRequestLog(config: InternalAxiosRequestConfig) {
+  if (!DEBUG) return;
+  const headers = { ...(config.headers as Record<string, unknown>) };
+  if ('Authorization' in headers) headers.Authorization = 'Bearer ***';
+  if ('authorization' in headers) headers.authorization = 'Bearer ***';
+
+  console.log('API Request:', {
+    method: config.method?.toUpperCase(),
+    url: config.url,
+    baseURL: config.baseURL,
+    data: config.data,
+    headers,
+  });
+}
+
+function safeResponseLog(res: AxiosResponse) {
+  if (!DEBUG) return;
+  console.log('API Response:', {
+    status: res.status,
+    url: res.config.url,
+    data: res.data,
+  });
+}
+
+function safeErrorLog(err: AxiosError) {
+  if (!DEBUG) return;
+  console.error('API Error:', {
+    status: err.response?.status,
+    url: err.config?.url,
+    message: err.message,
+    data: err.response?.data,
+  });
+}
+
+// --- 인터셉터들 ---
+// Request: Bearer 자동 부착(+ 안전 로깅)
+api.interceptors.request.use((config) => {
+  if (!shouldSkipAuth(config)) {
+    const token = getAccessToken();
+    if (token) {
+      config.headers = config.headers ?? {};
+      (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+    }
+  }
+  safeRequestLog(config);
   return config;
 });
 
-// Response interceptor for handling common errors
+// Response: 공통 로깅 + 401 처리(토큰 정리)
 api.interceptors.response.use(
-  (response) => {
-    // 개발 모드에서 응답 로깅
-    if (import.meta.env.VITE_DEBUG_MODE === 'true') {
-      console.log('API Response:', {
-        status: response.status,
-        url: response.config.url,
-        data: response.data,
-      });
-    }
-    return response;
+  (res) => {
+    safeResponseLog(res);
+    return res;
   },
-  (error) => {
-    // 공통 에러 처리
-    if (error.response?.status === 401) {
-      // 인증 오류 시 로그인 페이지로 리다이렉트
-      // window.location.href = '/login';
-    }
+  (err: AxiosError) => {
+    if (err.response?.status === 401) {
+      // 토큰 정리
+      const { clearTokens } = useAuthStore.getState();
+      if (clearTokens) clearTokens();
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('id_token');
+      localStorage.removeItem('refresh_token');
 
-    // 개발 모드에서 에러 로깅
-    if (import.meta.env.VITE_DEBUG_MODE === 'true') {
-      console.error('API Error:', {
-        status: error.response?.status,
-        url: error.config?.url,
-        message: error.message,
-        data: error.response?.data,
-      });
+      // 필요 시 로그인으로 이동 (리프레시 플로우 별도 이슈에서)
+      // window.location.assign('/login');
     }
-
-    return Promise.reject(error);
+    safeErrorLog(err);
+    return Promise.reject(err);
   },
 );
