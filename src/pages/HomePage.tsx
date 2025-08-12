@@ -24,7 +24,7 @@ import EventIcon from '@mui/icons-material/Event';
 import SecurityIcon from '@mui/icons-material/Security';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { tokens } from '../styles/theme';
-import { goLogin, goSignup } from '../../auth/hostedUi';
+import { goLogin, goSignup } from '../auth/hostedUi';
 
 export default function HomePage() {
   const navigate = useNavigate();

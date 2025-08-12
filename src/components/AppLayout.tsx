@@ -29,7 +29,7 @@ import SportsIcon from '@mui/icons-material/Sports';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import { tokens } from '../styles/theme';
-import { goLogin, goSignup } from '../../auth/hostedUi';
+import { goLogin, goSignup } from '../auth/hostedUi';
 
 export default function AppLayout() {
   const navigate = useNavigate();
