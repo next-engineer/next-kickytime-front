@@ -1,9 +1,11 @@
 import { api } from './axiosInstance';
 import type { User } from '../types';
 
-// API: GET /api/users/me
-// (Authorization: Bearer <access_token>)
-export async function fetchMyProfile(): Promise<User> {
-  const { data } = await api.get<User>('/api/users/me');
+export async function postUserMe(): Promise<void> {
+  await api.post('/user/me', null);
+}
+
+export async function getMyProfile(): Promise<User> {
+  const { data } = await api.get<User>('/user/me');
   return data;
 }
