@@ -21,6 +21,11 @@ function getAccessToken(): string | null {
   return tokens?.accessToken ?? localStorage.getItem('access_token');
 }
 
+function getIdToken(): string | null {
+  const { tokens } = useAuthStore.getState();
+  return tokens?.idToken ?? localStorage.getItem('id_token');
+}
+
 function toAbsoluteURL(url?: string, cfgBaseURL?: string): URL | null {
   if (!url) return null;
   try {
@@ -63,14 +68,8 @@ function safeRequestLog(config: InternalAxiosRequestConfig) {
   const headers = { ...(config.headers as Record<string, unknown>) };
   if ('Authorization' in headers) headers.Authorization = 'Bearer ***';
   if ('authorization' in headers) headers.authorization = 'Bearer ***';
-
-  console.log('API Request:', {
-    method: config.method?.toUpperCase(),
-    url: config.url,
-    baseURL: config.baseURL,
-    data: config.data,
-    headers,
-  });
+  if ('X-ID-Token' in headers) headers['X-ID-Token'] = '***';
+  if ('x-id-token' in headers) headers['x-id-token'] = '***';
 }
 
 function safeResponseLog(res: AxiosResponse) {
@@ -101,6 +100,11 @@ api.interceptors.request.use((config) => {
       config.headers = config.headers ?? {};
       (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
     }
+    const idToken = getIdToken();
+    if (idToken) {
+      config.headers = config.headers ?? {};
+      (config.headers as Record<string, string>)['X-ID-Token'] = idToken;
+    }
   }
   safeRequestLog(config);
   return config;
@@ -120,9 +124,6 @@ api.interceptors.response.use(
       localStorage.removeItem('access_token');
       localStorage.removeItem('id_token');
       localStorage.removeItem('refresh_token');
-
-      // 필요 시 로그인으로 이동 (리프레시 플로우 별도 이슈에서)
-      // window.location.assign('/login');
     }
     safeErrorLog(err);
     return Promise.reject(err);
