@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { ProtectedRoute, AdminRoute, PublicOnlyRoute } from './components/RouteGuards';
@@ -23,13 +23,9 @@ import MyMatchesPage from './pages/MyMatchesPage';
 import CreateMatchPage from './pages/CreateMatchPage';
 
 export default function App() {
-  const syncFromStorage = useCallback(() => {
+  useEffect(() => {
     useAuthStore.getState().syncFromStorage();
   }, []);
-
-  useEffect(() => {
-    syncFromStorage();
-  }, [syncFromStorage]);
 
   return (
     <BrowserRouter>
