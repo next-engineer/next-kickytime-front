@@ -19,6 +19,7 @@ export default function AuthCallbackPage() {
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : '인증 처리 중 오류가 발생했습니다.';
         setError(message);
+        navigate('/login', { replace: true });
       }
     })();
   }, [navigate]);
