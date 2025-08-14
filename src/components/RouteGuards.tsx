@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { UserRole } from '../types/index';
+import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -10,13 +11,24 @@ interface RouteGuardProps {
 
 // 로그인이 필요한 페이지를 보호하는 컴포넌트
 export const ProtectedRoute = ({ children }: RouteGuardProps) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, tokens } = useAuthStore();
   const location = useLocation();
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // 토큰이 있는지 확인하고 로딩 상태 해제
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100); // 짧은 지연으로 비동기 처리 대기
+
+    return () => clearTimeout(timer);
+  }, [tokens]);
+
   // 아직 인증 상태를 확인 중이면 로딩 표시
-  // if (isLoading) {
-  //   return <div>로딩 중...</div>;
-  // }
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
 
   // 로그인하지 않았다면 로그인 페이지로 리다이렉트
   // state에 현재 위치를 저장해서 로그인 후 다시 돌아올 수 있게 함
