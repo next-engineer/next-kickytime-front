@@ -6,6 +6,7 @@ import { Typography, TextField, Button, Paper, Box, Alert, Stack } from '@mui/ma
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockLogin } from '../store/useAuthStore';
+import { goLogin } from '../auth/hostedUi';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -23,9 +24,11 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     // API: AWS Cognito Hosted UI URL for Sign In
     // 실제로는 Cognito 로그인 플로우로 리다이렉트
     alert('실제 로그인은 AWS Cognito를 통해 구현됩니다.');
+    goLogin(); // Redirect to AWS Cognito Hosted UI for login
   };
 
   const handleMockLogin = (userType: 'admin' | 'user') => {
