@@ -27,6 +27,21 @@ jobs:
         with:
           node-version: 20
           cache: npm
+      - name: Create .env.production for Vite
+        run: |
+          cat > .env.production << 'EOF'
+          VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+          VITE_APP_NAME=Kickytime
+          VITE_APP_VERSION=1.0.0
+          VITE_USE_MOCK_DATA=false
+          VITE_DEBUG_MODE=false
+          VITE_COGNITO_DOMAIN=${{ vars.VITE_COGNITO_DOMAIN }}
+          VITE_COGNITO_CLIENT_ID=${{ vars.VITE_COGNITO_CLIENT_ID }}
+          VITE_COGNITO_REDIRECT_URI=${{ vars.VITE_COGNITO_REDIRECT_URI }}
+          EOF
+
+      - name: Show env keys (redacted)
+        run: sed -e 's/=.*/=<redacted>/' .env.production
 
       - name: Install & Build
         run: |
