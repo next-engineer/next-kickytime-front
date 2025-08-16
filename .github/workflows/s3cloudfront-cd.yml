@@ -1,0 +1,60 @@
+name: Deploy React to S3 + CloudFront
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET: kickytime-bucket        # ← 버킷명
+  CF_DIST_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+  BUILD_DIR: build                   # CRA=build, Vite=dist
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install & Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 1) 해시된 자산 -> 장기 캐시 + immutable
+      - name: Upload hashed assets
+        run: |
+          aws s3 sync "${{ env.BUILD_DIR }}" "s3://${{ env.S3_BUCKET }}" \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      # 2) index.html -> no-cache
+      - name: Upload index.html
+        run: |
+          aws s3 cp "${{ env.BUILD_DIR }}/index.html" "s3://${{ env.S3_BUCKET }}/index.html" \
+            --cache-control "no-cache" \
+            --content-type "text/html; charset=utf-8"
+
+      # 3) 최소 무효화
+      - name: Invalidate index.html
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ env.CF_DIST_ID }}" \
+            --paths "/index.html"
