@@ -3,6 +3,7 @@ import type { UserRole } from '../types/index';
 import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
+import { goLogin } from '../auth/hostedUi';
 
 // 공통 Props 타입
 interface RouteGuardProps {
@@ -33,7 +34,13 @@ export const ProtectedRoute = ({ children }: RouteGuardProps) => {
   // 로그인하지 않았다면 로그인 페이지로 리다이렉트
   // state에 현재 위치를 저장해서 로그인 후 다시 돌아올 수 있게 함
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // 홈 경로일 때는 가드 작동하지 않음
+    if (location.pathname === '/') {
+      return <>{children}</>;
+    }
+    // 다른 보호된 페이지일 때만 Cognito 로그인 UI로 리다이렉트
+    goLogin();
+    return null;
   }
 
   // 로그인했다면 원래 보려던 페이지 표시
@@ -56,7 +63,13 @@ export const RoleGuard = ({ children, requiredRole, fallbackPath = '/' }: RoleGu
 
   // 로그인하지 않았다면 로그인 페이지로
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // 홈 경로일 때는 가드 작동하지 않음
+    if (location.pathname === '/') {
+      return <>{children}</>;
+    }
+    // 다른 보호된 페이지일 때만 Cognito 로그인 UI로 리다이렉트
+    goLogin();
+    return null;
   }
 
   // 로그인했지만 권한이 없다면 fallback 경로로
