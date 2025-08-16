@@ -44,7 +44,8 @@ module.exports = {
   },
   parserPreset: {
     parserOpts: {
-      headerPattern: /^((?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}(?:\uFE0F)?|:\w+:)\s+)(\w+)(?:\(([^)]*)\))?!?:\s(.+)$/u,
+      headerPattern:
+        /^((?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}(?:\uFE0F)?|:\w+:)\s+)(\w+)(?:\(([^)]*)\))?!?:\s(.+)$/u,
       headerCorrespondence: ['emoji', 'type', 'scope', 'subject'],
     },
   },
