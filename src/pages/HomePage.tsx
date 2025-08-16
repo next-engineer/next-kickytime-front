@@ -234,20 +234,7 @@ export default function HomePage() {
                 </Button>
               </Stack>
             </Paper>
-          ) : (
-            <Paper
-              sx={{
-                p: 4,
-                maxWidth: 420,
-                mx: 'auto',
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-                boxShadow: tokens.shadows.lg,
-                border: `1px solid ${tokens.colors.neutral[200]}`,
-                borderRadius: tokens.borderRadius.xl,
-              }}
-            ></Paper>
-          )}
+          ) : null}
         </Container>
       </Box>
 
