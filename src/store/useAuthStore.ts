@@ -10,14 +10,10 @@ type Tokens = {
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
-  joinedMatchIds: number[];
 
   // 기존 액션
   login: (_user: User) => void;
   logout: () => void;
-  joinMatch: (_matchId: number) => void;
-  leaveMatch: (_matchId: number) => void;
-  setJoinedMatches: (_matchIds: number[]) => void;
 
   // 추가: 토큰 관련
   tokens: Tokens;
@@ -29,32 +25,9 @@ interface AuthState {
   setUser: (_user: User | null) => void; // ← [추가]
 }
 
-// Mock users (기존 유지)
-const mockUsers: Record<string, User> = {
-  admin: {
-    id: 1,
-    email: 'admin@kickytime.com',
-    nickname: '관리자',
-    role: 'ADMIN',
-    rank: 'MASTER',
-    imageUrl: '/images/default-profile.png',
-    createdAt: '2025-08-01T12:00:00Z',
-  },
-  user: {
-    id: 2,
-    email: 'user@kickytime.com',
-    nickname: '민지',
-    role: 'USER',
-    rank: 'BEGINNER',
-    imageUrl: '/images/default-profile.png',
-    createdAt: '2025-08-01T12:00:00Z',
-  },
-};
-
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   user: null,
-  joinedMatchIds: [1, 3],
 
   // 초기 토큰 상태
   tokens: {
@@ -76,25 +49,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       isAuthenticated: false,
       user: null,
-      joinedMatchIds: [],
       tokens: { idToken: null, accessToken: null, refreshToken: null },
     });
-  },
-
-  joinMatch: (matchId: number) => {
-    const { joinedMatchIds } = get();
-    if (!joinedMatchIds.includes(matchId)) {
-      set({ joinedMatchIds: [...joinedMatchIds, matchId] });
-    }
-  },
-
-  leaveMatch: (matchId: number) => {
-    const { joinedMatchIds } = get();
-    set({ joinedMatchIds: joinedMatchIds.filter((id) => id !== matchId) });
-  },
-
-  setJoinedMatches: (matchIds: number[]) => {
-    set({ joinedMatchIds: matchIds });
   },
 
   // 추가: 교환 결과를 직접 세팅하고 싶을 때 사용 가능
@@ -135,9 +91,3 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   // [추가] /user/me 결과 반영
   setUser: (_user) => set({ user: _user }), // ← [추가]
 }));
-
-// 기존 유지
-export const mockLogin = (userType: 'admin' | 'user') => {
-  const authStore = useAuthStore.getState();
-  authStore.login(mockUsers[userType]);
-};

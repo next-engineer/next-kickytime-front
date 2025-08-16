@@ -1,6 +1,6 @@
 import { COGNITO } from './config';
 import { useAuthStore } from '../store/useAuthStore';
-import { postUserMe, getMyProfile } from '../api/userApi';
+import { fetchUserProfile, postUserMe } from '../api/userApi';
 
 export type TokenResponse = {
   id_token: string;
@@ -57,7 +57,7 @@ export async function handleAuthCallback(): Promise<TokenResponse | null> {
 
   try {
     await postUserMe();
-    const me = await getMyProfile();
+    const me = await fetchUserProfile();
     useAuthStore.getState().setUser(me);
   } catch (e) {
     console.error('[callback] user sync failed', e);

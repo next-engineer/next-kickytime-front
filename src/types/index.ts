@@ -3,7 +3,7 @@ export type UserRank = 'BEGINNER' | 'INTERMEDIATE' | 'MASTER';
 export type MatchStatus = 'OPEN' | 'FULL' | 'CLOSED' | 'CANCELED';
 
 export interface User {
-  id: number; // userId -> id로 변경
+  id: number;
   email: string;
   nickname: string;
   cognitoSub?: string;
@@ -11,23 +11,21 @@ export interface User {
   password?: string; // nullable
   role: UserRole;
   rank: UserRank;
-  imageUrl: string; // profileImageUrl -> imageUrl로 변경
+  imageUrl: string;
   createdAt: string;
   updatedAt?: string;
 }
 
 export interface Match {
-  id: number; // matchId -> id로 변경
+  id?: number;
   location: string;
-  matchTime: string;
+  matchDateTime: string;
   maxPlayers: number;
-  matchStatus: MatchStatus; // 새로 추가
+  matchStatus: MatchStatus;
   createdBy: number;
   createdAt: string;
   updatedAt?: string;
-  // title 제거됨
-  // currentPlayers는 match_participants 테이블에서 계산
-  currentPlayers?: number; // 계산된 값
+  currentPlayers?: number; // currentPlayers는 match_participants 테이블에서 계산
 }
 
 export interface MatchParticipant {
@@ -39,6 +37,26 @@ export interface MatchParticipant {
 
 export interface CreateMatchRequest {
   location: string;
-  matchTime: string;
+  matchDateTime: string;
   maxPlayers: number;
+}
+
+export interface MyMatchesResponse {
+  summary: {
+    totalCount: number;
+    upcomingCount: number;
+    completedCount: number;
+  };
+  matches: MatchInfo[];
+}
+
+export interface MatchInfo {
+  id: number;
+  participantId: number;
+  location: string;
+  matchDateTime: string;
+  maxPlayers: number;
+  currentPlayers: number;
+  joinedAt: string;
+  matchStatus: 'OPEN' | 'FULL' | 'CLOSED' | 'CANCELED';
 }

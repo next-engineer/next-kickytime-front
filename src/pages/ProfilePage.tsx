@@ -20,8 +20,8 @@ import SportsIcon from '@mui/icons-material/Sports';
 import type { UserRank } from '../types';
 
 export default function ProfilePage() {
-  const { user, joinedMatchIds } = useAuthStore();
-  const { matches } = useMatchStore();
+  const { user } = useAuthStore();
+  const { matches, joinedIds } = useMatchStore();
 
   if (!user) {
     return (
@@ -65,10 +65,10 @@ export default function ProfilePage() {
     }
   };
 
-  const myMatches = matches.filter((match) => joinedMatchIds.includes(match.id));
+  const myMatches = matches.filter((match) => joinedIds.includes(match.id as number));
   const totalMatches = myMatches.length;
   const upcomingMatches = myMatches.filter(
-    (match) => new Date(match.matchTime) > new Date(),
+    (match) => new Date(match.matchDateTime) > new Date(),
   ).length;
 
   // API: GET /api/users/me

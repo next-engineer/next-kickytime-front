@@ -23,9 +23,11 @@ import MyMatchesPage from './pages/MyMatchesPage';
 import CreateMatchPage from './pages/CreateMatchPage';
 
 export default function App() {
+  const { syncFromStorage } = useAuthStore();
+
   useEffect(() => {
-    useAuthStore.getState().syncFromStorage();
-  }, []);
+    syncFromStorage();
+  }, [syncFromStorage]);
 
   return (
     <BrowserRouter>
@@ -39,6 +41,7 @@ export default function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/notfound" element={<NotFoundPage />} />
           <Route path="/matches" element={<MatchesPage />} />
+          <Route path="/unauthorized" element={<NotFoundPage />} />
 
           {/* 로그인하지 않은 사용자만 접근 가능 */}
           <Route
@@ -57,13 +60,6 @@ export default function App() {
               </PublicOnlyRoute>
             }
           />
-          {/* <Route 
-            path="/auth/callback" 
-            element={
-              <ProtectedRoute>
-                <AuthCallbackPage />
-              </ProtectedRoute>} 
-          /> */}
 
           {/* 로그인한 사용자만 접근 가능 */}
           <Route
@@ -75,7 +71,7 @@ export default function App() {
             }
           />
           <Route
-            path="/mymatches"
+            path="/matches/me"
             element={
               <ProtectedRoute>
                 <MyMatchesPage />
@@ -85,7 +81,7 @@ export default function App() {
 
           {/* 관리자만 접근 가능 */}
           <Route
-            path="/createMatch"
+            path="/admin/matches/new"
             element={
               <AdminRoute>
                 <CreateMatchPage />

@@ -16,26 +16,19 @@ import {
   Chip,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore, mockLogin } from '../store/useAuthStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { appConfig } from '../config/app';
 import SportsIcon from '@mui/icons-material/Sports';
 import PeopleIcon from '@mui/icons-material/People';
 import EventIcon from '@mui/icons-material/Event';
 import SecurityIcon from '@mui/icons-material/Security';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { tokens } from '../styles/theme';
-import { goLogin, goSignup } from '../auth/hostedUi';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { isAuthenticated, user } = useAuthStore();
-
-  const handleMockLogin = (userType: 'admin' | 'user') => {
-    mockLogin(userType);
-    navigate('/matches');
-  };
 
   const features = [
     {
@@ -242,142 +235,18 @@ export default function HomePage() {
               </Stack>
             </Paper>
           ) : (
-            <Stack spacing={4} alignItems="center">
-              <Paper
-                sx={{
-                  p: 4,
-                  maxWidth: 420,
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(10px)',
-                  boxShadow: tokens.shadows.lg,
-                  border: `1px solid ${tokens.colors.neutral[200]}`,
-                  borderRadius: tokens.borderRadius.xl,
-                }}
-              >
-                <Stack alignItems="center" spacing={3}>
-                  <Box
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: '50%',
-                      background: tokens.gradients.secondary,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: tokens.shadows.md,
-                    }}
-                  >
-                    <RocketLaunchIcon sx={{ fontSize: 24, color: 'white' }} />
-                  </Box>
-
-                  <Box textAlign="center">
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      sx={{ fontWeight: 700, color: tokens.colors.neutral[900] }}
-                    >
-                      🚀 데모 체험하기
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 3, fontWeight: 500 }}
-                    >
-                      실제 인증 없이 바로 체험해보세요
-                      {appConfig.useMockData && (
-                        <span
-                          style={{
-                            display: 'block',
-                            marginTop: 4,
-                            fontSize: '0.75rem',
-                            color: tokens.colors.warning[600],
-                          }}
-                        >
-                          (Mock 데이터 사용 중)
-                        </span>
-                      )}
-                    </Typography>
-                  </Box>
-
-                  <Stack spacing={2} sx={{ width: '100%' }}>
-                    <Button
-                      variant="contained"
-                      onClick={() => handleMockLogin('user')}
-                      fullWidth
-                      sx={{
-                        py: 1.5,
-                        fontWeight: 700,
-                        background: tokens.gradients.primary,
-                        boxShadow: tokens.shadows.sm,
-                        '&:hover': {
-                          boxShadow: tokens.shadows.md,
-                          transform: 'translateY(-1px)',
-                        },
-                      }}
-                    >
-                      일반 사용자로 체험
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => handleMockLogin('admin')}
-                      fullWidth
-                      sx={{
-                        py: 1.5,
-                        fontWeight: 700,
-                        borderWidth: 2,
-                        borderColor: tokens.colors.primary[400],
-                        color: tokens.colors.primary[700],
-                        '&:hover': {
-                          borderWidth: 2,
-                          borderColor: tokens.colors.primary[600],
-                          backgroundColor: tokens.colors.primary[50],
-                          transform: 'translateY(-1px)',
-                        },
-                      }}
-                    >
-                      관리자로 체험
-                    </Button>
-                  </Stack>
-                </Stack>
-              </Paper>
-
-              <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                spacing={2}
-                sx={{ width: { xs: '100%', sm: 'auto' } }}
-              >
-                <Button
-                  variant="outlined"
-                  onClick={() => goSignup()}
-                  sx={{
-                    borderColor: tokens.colors.neutral[400],
-                    color: tokens.colors.neutral[700],
-                    fontWeight: 600,
-                    '&:hover': {
-                      borderColor: tokens.colors.neutral[600],
-                      backgroundColor: tokens.colors.neutral[50],
-                    },
-                  }}
-                >
-                  회원가입
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => goLogin()}
-                  sx={{
-                    borderColor: tokens.colors.neutral[400],
-                    color: tokens.colors.neutral[700],
-                    fontWeight: 600,
-                    '&:hover': {
-                      borderColor: tokens.colors.neutral[600],
-                      backgroundColor: tokens.colors.neutral[50],
-                    },
-                  }}
-                >
-                  로그인
-                </Button>
-              </Stack>
-            </Stack>
+            <Paper
+              sx={{
+                p: 4,
+                maxWidth: 420,
+                mx: 'auto',
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                boxShadow: tokens.shadows.lg,
+                border: `1px solid ${tokens.colors.neutral[200]}`,
+                borderRadius: tokens.borderRadius.xl,
+              }}
+            ></Paper>
           )}
         </Container>
       </Box>

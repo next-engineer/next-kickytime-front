@@ -1,7 +1,4 @@
-'use client';
-
 import { Typography, Grid, Box, Button, Paper, Stack, Avatar, Chip } from '@mui/material';
-import { useAuthStore } from '../store/useAuthStore';
 import { useMatchStore } from '../store/useMatchStore';
 import MatchCard from '../components/MatchCard';
 import { useNavigate } from 'react-router-dom';
@@ -9,18 +6,17 @@ import EventIcon from '@mui/icons-material/Event';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { tokens } from '../styles/theme';
+import useLoadMatches from '../hooks/useLoadMatches';
 
 export default function MyMatchesPage() {
   const navigate = useNavigate();
-  const { joinedMatchIds } = useAuthStore();
-  const { matches } = useMatchStore();
+  const { matches, joinedIds } = useMatchStore();
 
-  // API: GET /api/matches/me
-  // (Authorization: Bearer <access_token>)
+  useLoadMatches();
 
-  const myMatches = matches.filter((match) => joinedMatchIds.includes(match.id));
-  const upcomingMatches = myMatches.filter((match) => new Date(match.matchTime) > new Date());
-  const pastMatches = myMatches.filter((match) => new Date(match.matchTime) <= new Date());
+  const myMatches = matches.filter((match) => joinedIds.includes(match.id as number));
+  const upcomingMatches = myMatches.filter((match) => new Date(match.matchDateTime) > new Date());
+  const pastMatches = myMatches.filter((match) => new Date(match.matchDateTime) <= new Date());
 
   return (
     <Box>
@@ -122,7 +118,7 @@ export default function MyMatchesPage() {
                 <Grid container spacing={3} sx={{ width: '100%', maxWidth: '1200px' }}>
                   {upcomingMatches.map((match) => (
                     <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={match.id}>
-                      <MatchCard match={match} showCancelButton={true} />
+                      <MatchCard match={match} showLeaveButton={true} />
                     </Grid>
                   ))}
                 </Grid>

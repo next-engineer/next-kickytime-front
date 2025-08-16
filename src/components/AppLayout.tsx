@@ -53,7 +53,7 @@ export default function AppLayout() {
 
   const navigationItems = [
     { label: '전체 매칭', path: '/matches', icon: '⚽' },
-    ...(user?.role === 'USER' ? [{ label: '내 매칭', path: '/matches/mine', icon: '📋' }] : []),
+    ...(user?.role === 'USER' ? [{ label: '내 매칭', path: '/matches/me', icon: '📋' }] : []),
     ...(user?.role === 'ADMIN'
       ? [{ label: '매칭 개설', path: '/admin/matches/new', icon: '➕' }]
       : []),

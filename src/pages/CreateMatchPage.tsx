@@ -1,7 +1,4 @@
-'use client';
-
 import type React from 'react';
-
 import {
   Typography,
   TextField,
@@ -15,7 +12,6 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMatchStore } from '../store/useMatchStore';
 import { useAuthStore } from '../store/useAuthStore';
 import type { CreateMatchRequest, Match } from '../types';
 import AddIcon from '@mui/icons-material/Add';
@@ -23,15 +19,16 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PeopleIcon from '@mui/icons-material/People';
 import { tokens } from '../styles/theme';
+import { createMatch } from '../api/matchApi';
 
 export default function CreateMatchPage() {
   const navigate = useNavigate();
-  const { addMatch } = useMatchStore();
+  // const { addMatch } = useMatchStore();
   const { user } = useAuthStore();
 
   const [formData, setFormData] = useState<CreateMatchRequest>({
     location: '',
-    matchTime: '',
+    matchDateTime: '',
     maxPlayers: 10,
   });
 
@@ -43,9 +40,13 @@ export default function CreateMatchPage() {
     });
   };
 
+  // Get current datetime for min attribute
+  const now = new Date();
+  const thirtyMinutesLater = new Date(now.getTime() + 30 * 60 * 1000);
+  const minDateTime = thirtyMinutesLater.toISOString().slice(0, 16);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!user) return;
 
     // API: POST /api/matches
@@ -53,21 +54,17 @@ export default function CreateMatchPage() {
     // Body: formData
 
     const newMatch: Match = {
-      id: Date.now(), // Mock ID generation
       ...formData,
+      matchDateTime: minDateTime, // Ensure matchTime is at least 30 minutes later
       matchStatus: 'OPEN',
       createdBy: user.id,
       createdAt: new Date().toISOString(),
       currentPlayers: 0,
     };
 
-    addMatch(newMatch);
+    createMatch(newMatch);
     navigate('/matches');
   };
-
-  // Get current datetime for min attribute
-  const now = new Date();
-  const minDateTime = now.toISOString().slice(0, 16);
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto' }}>
@@ -167,11 +164,9 @@ export default function CreateMatchPage() {
               <TextField
                 name="matchTime"
                 type="datetime-local"
-                value={formData.matchTime}
+                value={formData.matchDateTime}
                 onChange={handleChange}
                 required
-                InputLabelProps={{ shrink: true }}
-                inputProps={{ min: minDateTime }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     fontSize: '1rem',
@@ -196,7 +191,6 @@ export default function CreateMatchPage() {
                 value={formData.maxPlayers}
                 onChange={handleChange}
                 required
-                inputProps={{ min: 2, max: 22 }}
                 helperText="2명 이상 22명 이하로 설정해주세요"
                 sx={{
                   '& .MuiOutlinedInput-root': {

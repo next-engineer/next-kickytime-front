@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Typography,
   Grid,
@@ -20,19 +18,36 @@ import AddIcon from '@mui/icons-material/Add';
 import SportsIcon from '@mui/icons-material/Sports';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { tokens } from '../styles/theme';
+import useLoadMatches from '../hooks/useLoadMatches';
+import { joinMatch, leaveMatch } from '../api/matchApi';
 
 export default function MatchesPage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const { user, joinedMatchIds } = useAuthStore();
-  const { matches } = useMatchStore();
-
-  // API: GET /api/matches
-  // (Authorization: Bearer <access_token>)
-
+  const { updateMatchParticipants, setJoined } = useMatchStore();
+  const { user } = useAuthStore();
+  const { matches, joinedIds } = useMatchStore();
   const activeMatches = matches.filter((match) => match.matchStatus === 'OPEN');
   const fullMatches = matches.filter((match) => match.matchStatus === 'FULL');
+
+  useLoadMatches();
+
+  const handleJoin = async (id: number) => {
+    // API: POST /api/matches/{matchId}/participants
+    // (Authorization: Bearer <access_token>)
+    await joinMatch(id);
+    setJoined([...joinedIds, id]);
+    updateMatchParticipants(id, +1);
+  };
+
+  const handleCancel = async (id: number) => {
+    // API: DELETE /api/matches/{matchId}/participants
+    // (Authorization: Bearer <access_token>)
+    await leaveMatch(id);
+    setJoined(joinedIds.filter((x) => x !== id));
+    updateMatchParticipants(id, -1);
+  };
 
   return (
     <Box>
@@ -115,7 +130,7 @@ export default function MatchesPage() {
               />
               {user?.role === 'USER' && (
                 <Chip
-                  label={`참여중 ${joinedMatchIds.length}개`}
+                  label={`참여중 ${joinedIds.length}개`}
                   color="primary"
                   variant="outlined"
                   sx={{ fontWeight: 600 }}
@@ -153,15 +168,16 @@ export default function MatchesPage() {
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Grid container spacing={3} sx={{ width: '100%', maxWidth: '1200px' }}>
             {matches.map((match) => {
-              const isJoined = joinedMatchIds.includes(match.id);
-
+              const joined = joinedIds.includes(match.id as number);
               return (
                 <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={match.id}>
                   <MatchCard
                     match={match}
-                    showJoinButton={user?.role === 'USER' && !isJoined}
-                    showCancelButton={user?.role === 'USER' && isJoined}
+                    showJoinButton={user?.role === 'USER' && !joined}
+                    showLeaveButton={user?.role === 'USER' && joined}
                     showDeleteButton={user?.role === 'ADMIN'}
+                    onJoin={handleJoin}
+                    onLeave={handleCancel}
                   />
                 </Grid>
               );
