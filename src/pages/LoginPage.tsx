@@ -1,11 +1,8 @@
-'use client';
-
 import type React from 'react';
 
-import { Typography, TextField, Button, Paper, Box, Alert, Stack } from '@mui/material';
+import { Typography, TextField, Button, Paper, Box, Alert } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockLogin } from '../store/useAuthStore';
 import { goLogin } from '../auth/hostedUi';
 
 export default function LoginPage() {
@@ -29,11 +26,6 @@ export default function LoginPage() {
     // 실제로는 Cognito 로그인 플로우로 리다이렉트
     alert('실제 로그인은 AWS Cognito를 통해 구현됩니다.');
     goLogin(); // Redirect to AWS Cognito Hosted UI for login
-  };
-
-  const handleMockLogin = (userType: 'admin' | 'user') => {
-    mockLogin(userType);
-    navigate('/matches');
   };
 
   return (
@@ -76,19 +68,6 @@ export default function LoginPage() {
             계정이 없으신가요? 회원가입
           </Button>
         </form>
-
-        <Alert severity="warning" sx={{ mb: 2 }}>
-          데모용 로그인 (실제 인증 미구현)
-        </Alert>
-
-        <Stack spacing={1}>
-          <Button variant="outlined" onClick={() => handleMockLogin('user')} fullWidth>
-            일반 사용자로 로그인
-          </Button>
-          <Button variant="outlined" onClick={() => handleMockLogin('admin')} fullWidth>
-            관리자로 로그인
-          </Button>
-        </Stack>
       </Paper>
     </Box>
   );
