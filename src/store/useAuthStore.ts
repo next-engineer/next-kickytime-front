@@ -10,14 +10,10 @@ type Tokens = {
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
-  joinedMatchIds: number[];
 
   // 기존 액션
   login: (_user: User) => void;
   logout: () => void;
-  joinMatch: (_matchId: number) => void;
-  leaveMatch: (_matchId: number) => void;
-  setJoinedMatches: (_matchIds: number[]) => void;
 
   // 추가: 토큰 관련
   tokens: Tokens;
@@ -54,7 +50,6 @@ const mockUsers: Record<string, User> = {
 export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   user: null,
-  joinedMatchIds: [1, 3],
 
   // 초기 토큰 상태
   tokens: {
@@ -76,25 +71,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       isAuthenticated: false,
       user: null,
-      joinedMatchIds: [],
       tokens: { idToken: null, accessToken: null, refreshToken: null },
     });
-  },
-
-  joinMatch: (matchId: number) => {
-    const { joinedMatchIds } = get();
-    if (!joinedMatchIds.includes(matchId)) {
-      set({ joinedMatchIds: [...joinedMatchIds, matchId] });
-    }
-  },
-
-  leaveMatch: (matchId: number) => {
-    const { joinedMatchIds } = get();
-    set({ joinedMatchIds: joinedMatchIds.filter((id) => id !== matchId) });
-  },
-
-  setJoinedMatches: (matchIds: number[]) => {
-    set({ joinedMatchIds: matchIds });
   },
 
   // 추가: 교환 결과를 직접 세팅하고 싶을 때 사용 가능
