@@ -25,29 +25,7 @@ interface AuthState {
   setUser: (_user: User | null) => void; // ← [추가]
 }
 
-// Mock users (기존 유지)
-const mockUsers: Record<string, User> = {
-  admin: {
-    id: 1,
-    email: 'admin@kickytime.com',
-    nickname: '관리자',
-    role: 'ADMIN',
-    rank: 'MASTER',
-    imageUrl: '/images/default-profile.png',
-    createdAt: '2025-08-01T12:00:00Z',
-  },
-  user: {
-    id: 2,
-    email: 'user@kickytime.com',
-    nickname: '민지',
-    role: 'USER',
-    rank: 'BEGINNER',
-    imageUrl: '/images/default-profile.png',
-    createdAt: '2025-08-01T12:00:00Z',
-  },
-};
-
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   user: null,
 
@@ -113,9 +91,3 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   // [추가] /user/me 결과 반영
   setUser: (_user) => set({ user: _user }), // ← [추가]
 }));
-
-// 기존 유지
-export const mockLogin = (userType: 'admin' | 'user') => {
-  const authStore = useAuthStore.getState();
-  authStore.login(mockUsers[userType]);
-};
