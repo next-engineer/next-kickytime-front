@@ -1,0 +1,86 @@
+name: Deploy React to S3 + CloudFront
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch: {}   # 수동 실행 버튼
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET: kickytime-bucket
+  CF_DIST_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+  BUILD_DIR: build   # 기본값(CRA). 아래에서 자동 감지로 덮어씀.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write    # OIDC 필수
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install & Build
+        run: |
+          npm ci
+          npm run build
+
+      # build / dist / out 중 존재하는 폴더 자동 감지
+      - name: Detect build output dir
+        id: detect
+        run: |
+          set -e
+          echo "Repository root:"
+          ls -la
+
+          for d in build dist out; do
+            if [ -d "$d" ]; then
+              echo "Detected build dir: $d"
+              echo "BUILD_DIR=$d" >> "$GITHUB_ENV"
+              exit 0
+            fi
+          done
+
+          echo "::error::No build output directory found (expected one of: build, dist, out)."
+          exit 1
+
+      - name: Verify build dir
+        run: |
+          echo "Using BUILD_DIR=$BUILD_DIR"
+          ls -la "$BUILD_DIR"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 1) 해시된 자산 → 장기 캐시
+      - name: Upload hashed assets
+        run: |
+          aws s3 sync "$BUILD_DIR" "s3://$S3_BUCKET" \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      # 2) index.html → no-cache
+      - name: Upload index.html
+        run: |
+          aws s3 cp "$BUILD_DIR/index.html" "s3://$S3_BUCKET/index.html" \
+            --cache-control "no-cache" \
+            --content-type "text/html; charset=utf-8"
+
+      # 3) 최소 무효화 (index.html만)
+      - name: Invalidate index.html
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$CF_DIST_ID" \
+            --paths "/index.html"
