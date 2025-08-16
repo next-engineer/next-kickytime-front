@@ -25,22 +25,27 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import { tokens } from '../styles/theme';
+import { deleteMatch } from '../api/matchApi';
 
 interface MatchCardProps {
   match: Match;
   showJoinButton?: boolean;
-  showCancelButton?: boolean;
+  showLeaveButton?: boolean;
   showDeleteButton?: boolean;
+  onJoin?: (id: number) => void;
+  onLeave?: (id: number) => void;
 }
 
 export default function MatchCard({
   match,
   showJoinButton = false,
-  showCancelButton = false,
+  showLeaveButton = false,
   showDeleteButton = false,
+  onJoin = () => {},
+  onLeave = () => {},
 }: MatchCardProps) {
-  const { user, joinMatch, leaveMatch, joinedMatchIds } = useAuthStore();
-  const { removeMatch, updateMatchParticipants } = useMatchStore();
+  const { user } = useAuthStore();
+  const { removeMatch, joinedIds } = useMatchStore();
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -61,34 +66,22 @@ export default function MatchCard({
     return timeStr;
   };
 
-  const handleJoin = () => {
-    // API: POST /api/matches/{matchId}/participants
-    // (Authorization: Bearer <access_token>)
-    joinMatch(match.id);
-    updateMatchParticipants(match.id, (match.currentPlayers || 0) + 1);
-  };
-
-  const handleCancel = () => {
-    // API: DELETE /api/matches/{matchId}/participants
-    // (Authorization: Bearer <access_token>)
-    leaveMatch(match.id);
-    updateMatchParticipants(match.id, (match.currentPlayers || 0) - 1);
-  };
-
   const handleDelete = () => {
-    if (window.confirm('정말로 이 매칭을 삭제하시겠습니까?')) {
+    if (window.confirm('정말로 이 매치를 삭제하시겠습니까?')) {
       // API: DELETE /api/matches/{matchId}
       // (Authorization: Bearer <access_token>)
-      removeMatch(match.id);
+      deleteMatch(match.id as number);
+      removeMatch(match.id as number);
     }
   };
 
-  const isJoined = joinedMatchIds.includes(match.id);
   const currentPlayers = match.currentPlayers || 0;
+  const participationRate = (currentPlayers / match.maxPlayers) * 100;
+
+  const isJoined = joinedIds.includes(match.id as number);
   const isFull = match.matchStatus === 'FULL' || currentPlayers >= match.maxPlayers;
   const isClosed = match.matchStatus === 'CLOSED';
   const isCanceled = match.matchStatus === 'CANCELED';
-  const participationRate = (currentPlayers / match.maxPlayers) * 100;
 
   const getStatusColor = () => {
     switch (match.matchStatus) {
@@ -124,7 +117,7 @@ export default function MatchCard({
   const getMatchTitle = () => {
     const locationParts = match.location.split(' ');
     const area = locationParts[0] || '풋살장';
-    const time = new Date(match.matchTime).toLocaleString('ko-KR', {
+    const time = new Date(match.matchDateTime).toLocaleString('ko-KR', {
       weekday: 'short',
       hour: '2-digit',
       minute: '2-digit',
@@ -296,7 +289,7 @@ export default function MatchCard({
                 color: tokens.colors.neutral[700],
               }}
             >
-              {formatDateTime(match.matchTime)}
+              {formatDateTime(match.matchDateTime)}
             </Typography>
           </Box>
 
@@ -374,7 +367,7 @@ export default function MatchCard({
           <Button
             variant="contained"
             fullWidth
-            onClick={handleJoin}
+            onClick={() => onJoin?.(match.id as number)}
             disabled={isFull}
             sx={{
               py: 1.5,
@@ -396,12 +389,12 @@ export default function MatchCard({
           </Button>
         )}
 
-        {showCancelButton && isJoined && !isClosed && !isCanceled && (
+        {showLeaveButton && isJoined && !isClosed && !isCanceled && (
           <Button
             variant="outlined"
             color="error"
             fullWidth
-            onClick={handleCancel}
+            onClick={() => onLeave?.(match.id as number)}
             startIcon={<CancelIcon sx={{ fontSize: 18 }} />}
             sx={{
               py: 1.5,
