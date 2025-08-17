@@ -40,11 +40,6 @@ export default function CreateMatchPage() {
     });
   };
 
-  // Get current datetime for min attribute
-  const now = new Date();
-  const thirtyMinutesLater = new Date(now.getTime() + 30 * 60 * 1000);
-  const minDateTime = thirtyMinutesLater.toISOString().slice(0, 16);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -55,7 +50,6 @@ export default function CreateMatchPage() {
 
     const newMatch: Match = {
       ...formData,
-      matchDateTime: minDateTime, // Ensure matchTime is at least 30 minutes later
       matchStatus: 'OPEN',
       createdBy: user.id,
       createdAt: new Date().toISOString(),
@@ -143,6 +137,7 @@ export default function CreateMatchPage() {
                 value={formData.location}
                 onChange={handleChange}
                 required
+                fullWidth
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     fontSize: '1rem',
@@ -162,16 +157,12 @@ export default function CreateMatchPage() {
                 </Typography>
               </Stack>
               <TextField
-                name="matchTime"
+                name="matchDateTime" // name을 matchDateTime으로 수정
                 type="datetime-local"
                 value={formData.matchDateTime}
                 onChange={handleChange}
                 required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    fontSize: '1rem',
-                  },
-                }}
+                fullWidth
               />
             </Box>
 
@@ -191,6 +182,11 @@ export default function CreateMatchPage() {
                 value={formData.maxPlayers}
                 onChange={handleChange}
                 required
+                fullWidth
+                inputProps={{
+                  min: 2,
+                  max: 22,
+                }}
                 helperText="2명 이상 22명 이하로 설정해주세요"
                 sx={{
                   '& .MuiOutlinedInput-root': {
