@@ -19,20 +19,11 @@
 
 ---
 
-[![Docs: Wiki](https://img.shields.io/badge/docs-Wiki-0366d6)](../../wiki)
+[![Docs: Wiki](https://img.shields.io/badge/docs-Wiki-0366d6)](https://github.com/next-engineer/next-kickytime-front/wiki)
 
 > 자세한 운영/가이드는 GitHub **Wiki**를 참고하세요.
 
-### 📚 Wiki 빠른 링크
-
-- [Home](../../wiki)
-- [API 문서](../../wiki/API-문서)
-- [브랜치 전략](../../wiki/브랜치-전략)
-- [버전 관리 전략](../../wiki/버전-관리-전략)
-- [이슈 템플릿 가이드](../../wiki/이슈-템플릿-가이드)
-- [커밋 메시지 규칙](../../wiki/커밋-메시지-규칙)
-- [코드 스타일 자동화 설정](../../wiki/코드-스타일-자동화-설정)
-- [풀리퀘스트 템플릿](../../wiki/풀리퀘스트-템플릿)
+### [📚 Wiki 빠른 링크](https://github.com/next-engineer/next-kickytime-front/wiki)
 
 ---
 
@@ -132,7 +123,7 @@ npm run format:check  # 포맷 체크
   - `GET /matches`, `POST /matches/{id}/participants`, ...
   - `GET /users/me`
 
-자세히 보기: [API 문서](../../wiki/API-문서)
+자세히 보기: [API 문서](https://github.com/next-engineer/next-kickytime-front/wiki/API-문서)
 
 ---
 
@@ -168,8 +159,8 @@ npx lint-staged
 
 자세히 보기:
 
-- [커밋 메시지 규칙](../../wiki/커밋-메시지-규칙)
-- [브랜치 전략](../../wiki/브랜치-전략)
-- [이슈 템플릿 가이드](../../wiki/이슈-템플릿-가이드)
-- [풀리퀘스트 템플릿](../../wiki/풀리퀘스트-템플릿)
-- [코드 스타일 자동화 설정](../../wiki/코드-스타일-자동화-설정)
+- [커밋 메시지 규칙](https://github.com/next-engineer/next-kickytime-front/wiki/커밋-메시지-규칙)
+- [브랜치 전략](https://github.com/next-engineer/next-kickytime-front/wiki/브랜치-전략)
+- [이슈 템플릿 가이드](https://github.com/next-engineer/next-kickytime-front/wiki/이슈-템플릿-가이드)
+- [풀리퀘스트 템플릿](https://github.com/next-engineer/next-kickytime-front/wiki/풀리퀘스트-템플릿)
+- [코드 스타일 자동화 설정](https://github.com/next-engineer/next-kickytime-front/wiki/코드-스타일-자동화-설정)
