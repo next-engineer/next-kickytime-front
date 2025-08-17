@@ -382,3 +382,5 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/git,intellij,visualstudiocode,react,node,nextjs,venv,windows,macos
+
+.env.development

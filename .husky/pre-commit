@@ -1,0 +1,7 @@
+#!/bin/bash
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "💚 Running lint-staged (ESLint + Prettier)..."
+npx lint-staged
+
+# npm test
