@@ -3,4 +3,4 @@ dist
 build
 .next
 coverage
-.github/workflows/**
+.github/
