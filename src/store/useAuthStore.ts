@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { User } from '../types';
+import { fetchUserProfile } from '../api/userApi';
 
 type Tokens = {
   idToken: string | null;
@@ -10,6 +11,7 @@ type Tokens = {
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
+  isLoading: boolean;
 
   // 기존 액션
   login: (_user: User) => void;
@@ -18,16 +20,17 @@ interface AuthState {
   // 추가: 토큰 관련
   tokens: Tokens;
   setTokens: (tokens: Tokens) => void;
-  syncFromStorage: () => void;
+  syncFromStorage: () => Promise<void>;
   clearTokens: () => void;
 
   // [추가] /user/me 응답을 전역에 반영하기 위한 액션
   setUser: (_user: User | null) => void; // ← [추가]
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   user: null,
+  isLoading: true,
 
   // 초기 토큰 상태
   tokens: {
@@ -66,15 +69,51 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
 
-  // 추가: localStorage → store 동기화
-  syncFromStorage: () => {
-    const idToken = localStorage.getItem('id_token');
-    const accessToken = localStorage.getItem('access_token');
-    const refreshToken = localStorage.getItem('refresh_token');
-    set({
-      tokens: { idToken, accessToken, refreshToken },
-      isAuthenticated: Boolean(accessToken),
-    });
+  // 🔥 수정: 사용자 정보도 함께 복원
+  syncFromStorage: async () => {
+    try {
+      const idToken = localStorage.getItem('id_token');
+      const accessToken = localStorage.getItem('access_token');
+      const refreshToken = localStorage.getItem('refresh_token');
+
+      if (!accessToken) {
+        set({
+          tokens: { idToken: null, accessToken: null, refreshToken: null },
+          isAuthenticated: false,
+          user: null,
+          isLoading: false,
+        });
+        return;
+      }
+
+      // 토큰 복원
+      set({
+        tokens: { idToken, accessToken, refreshToken },
+        isAuthenticated: true,
+        isLoading: true, // 사용자 정보 로딩 중
+      });
+
+      // 사용자 정보 복원 시도
+      try {
+        const userProfile = await fetchUserProfile();
+        set({
+          user: userProfile,
+          isLoading: false,
+        });
+      } catch (error) {
+        console.error('사용자 정보 복원 실패:', error);
+        // API 실패 시 토큰도 정리
+        get().clearTokens();
+      }
+    } catch (error) {
+      console.error('인증 상태 복원 실패:', error);
+      set({
+        tokens: { idToken: null, accessToken: null, refreshToken: null },
+        isAuthenticated: false,
+        user: null,
+        isLoading: false,
+      });
+    }
   },
 
   // 추가: 로그아웃 외 개별적으로 토큰 비우고 싶을 때

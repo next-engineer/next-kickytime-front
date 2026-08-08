@@ -4,3 +4,6 @@ build
 .next
 coverage
 .github/
+
+# semantic-release가 생성/커밋하는 파일이라 포맷 검사 대상에서 제외
+CHANGELOG.md
