@@ -2,7 +2,8 @@ import { COGNITO } from './config';
 import { createPkce } from './pkce';
 
 function buildAuthorizeUrl(path: 'login' | 'signup', challenge: string) {
-  const u = new URL(`${COGNITO.hostedUiDomain}/${path}`);
+  const endpoint = path === 'login' ? 'oauth2/authorize' : 'signup';
+  const u = new URL(`${COGNITO.hostedUiDomain}/${endpoint}`);
   u.searchParams.set('response_type', 'code');
   u.searchParams.set('client_id', COGNITO.clientId);
   u.searchParams.set('redirect_uri', COGNITO.redirectUri);
