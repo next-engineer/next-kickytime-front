@@ -8,7 +8,7 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET: kickytime-bucket
+  S3_BUCKET: kickytime-frontend-205366594951
   CF_DIST_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
   BUILD_DIR: build
 
